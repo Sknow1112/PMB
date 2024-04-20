@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Persistent Memory Bot</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(to bottom right, #222222, #333333);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #f0f8ff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #chat-history {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            height: 400px;
+            overflow-y: scroll;
+            background-color: #1e1e1e;
+            color: #f0f8ff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        #chat-history p {
+            margin: 5px 0;
+        }
+
+        #chat-form {
+            display: flex;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 5px 10px;
+            font-size: 16px;
+            background-color: #59788E;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $('#chat-form').submit(function(event) {
+                event.preventDefault();
+                var userInput = $('#user-input').val();
+                $.ajax({
+                    url: '/chat',
+                    method: 'POST',
+                    data: { user_input: userInput },
+                    success: function(response) {
+                        $('#chat-history').append('<p><strong>You:</strong> ' + userInput + '</p>');
+                        $('#chat-history').append('<p><strong>PMB:</strong> ' + response.response + '</p>');
+                        $('#user-input').val('');
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Persistent Memory Bot</h1>
+    <div id="chat-history"></div>
+    <form id="chat-form">
+        <input type="text" id="user-input" name="user_input" placeholder="Enter your message">
+        <button type="submit">Send</button>
+    </form>
+</body>
+</html>
