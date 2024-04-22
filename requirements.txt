@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+jinja2
+sqlite3
+llama-cpp-python

@@ -5,7 +5,7 @@ from llama_cpp import Llama
 
 class PMBL:
     def __init__(self, model_path):
-        self.llm = Llama(model_path=model_path, n_ctx=32768, n_threads=8, n_gpu_layers=35)
+        self.llm = Llama(model_path=model_path, n_ctx=29000, n_threads=8, n_gpu_layers=35)
         self.init_db()
 
     def init_db(self):
@@ -24,7 +24,7 @@ class PMBL:
         c = conn.cursor()
         c.execute("SELECT timestamp, prompt, response FROM chats")
         history = [{"role": "system",
-                    "content": "You are an intelligent assistant named PMB - Persistent Memory Bot. You always provide well-reasoned answers that are both correct and helpful."}]
+                    "content": "You are an intelligent assistant named PMB - Persistent Memory Bot. You always provide well-reasoned answers that are consise, correct and helpful"}]
         for row in c.fetchall():
             history.append({"role": "assistant", "content": f"[{row[0]}] {row[2]}"})
             history.append({"role": "user", "content": row[1]})
@@ -44,18 +44,25 @@ class PMBL:
 
         messages = [
             {"role": "system",
-             "content": "You are an intelligent assistant named PMB - Persistent Memory Bot. You always provide well-reasoned answers that are both correct and helpful."}
+             "content": "You are an intelligent assistant named PMB - Persistent Memory Bot. You always provide well-reasoned answers that are often short, consise, correct and helpful."}
         ]
         messages.extend(history)
 
-        response = self.llm.create_chat_completion(
-            messages=messages,
-            max_tokens=512,
-            stop=["</s>"],
-            echo=True
+        formatted_messages = ""
+        for message in messages:
+            formatted_messages += f"{message['role']}: {message['content']}\n"
+
+        prompt_with_history = f"Below is the conversation history for your reference. Don't mention a topic unless the user brings it up.\n\n{formatted_messages}\nAssistant:"
+
+        response = self.llm(
+            prompt_with_history,
+            max_tokens=29000,
+            temperature=0.7,
+            stop=["</s>", "\nHuman:"],
+            echo=False
         )
 
-        response_text = response['choices'][0]['message']['content']
+        response_text = response['choices'][0]['text'].strip()
 
         self.save_chat_history(prompt, response_text)
 

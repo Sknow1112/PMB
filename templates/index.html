@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Persistent Memory Bot</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   <style>
+       body {
+           font-family: Arial, sans-serif;
+           max-width: 800px;
+           margin: 0 auto;
+           padding: 20px;
+           background: linear-gradient(to bottom right, #222222, #333333);
+       }
+
+       h1 {
+           text-align: center;
+           margin-bottom: 20px;
+           color: #f0f8ff;
+           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+       }
+
+       #chat-container {
+           border: 1px solid #ccc;
+           border-radius: 5px;
+           padding: 10px;
+           margin-bottom: 20px;
+           height: 400px;
+           overflow-y: scroll;
+           background-color: #1e1e1e;
+           color: #f0f8ff;
+           text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+       }
+
+       .message {
+           margin: 5px 0;
+           padding: 8px;
+           border-radius: 5px;
+           max-width: 80%;
+       }
+
+       .user-message {
+           background-color: #59788E;
+           color: white;
+           align-self: flex-end;
+           margin-left: auto;
+       }
+
+       .bot-message {
+           background-color: #2c3e4c;
+           color: white;
+           align-self: flex-start;
+           margin-right: auto;
+       }
+
+       #chat-form {
+           display: flex;
+       }
+
+       #user-input {
+           flex-grow: 1;
+           padding: 10px;
+           font-size: 16px;
+           border: none;
+           border-radius: 5px;
+       }
+
+       button {
+           padding: 10px;
+           font-size: 16px;
+           background-color: #59788E;
+           color: white;
+           border: none;
+           border-radius: 5px;
+           cursor: pointer;
+           margin-left: 10px;
+       }
+
+       button:hover {
+           background-color: #45a049;
+       }
+
+       .icon {
+           margin-right: 5px;
+       }
+   </style>
+   <script>
+       $(document).ready(function() {
+           $('#chat-form').submit(function(event) {
+               event.preventDefault();
+               var userInput = $('#user-input').val();
+               $.ajax({
+                   url: '/chat',
+                   method: 'POST',
+                   data: JSON.stringify({ user_input: userInput }),
+                   contentType: 'application/json',
+                   success: function(response) {
+                       $('#chat-container').append('<div class="message user-message"><i class="fas fa-user icon"></i>' + userInput + '</div>');
+                       $('#chat-container').append('<div class="message bot-message"><i class="fas fa-robot icon"></i>' + response.response + '</div>');
+                       $('#user-input').val('');
+                       $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
+                   }
+               });
+           });
+       });
+   </script>
+</head>
+<body>
+   <h1>Persistent Memory Bot</h1>
+   <div id="chat-container"></div>
+   <form id="chat-form">
+       <input type="text" id="user-input" name="user_input" placeholder="Enter your message">
+       <button type="submit"><i class="fas fa-paper-plane"></i> Send</button>
+   </form>
+</body>
+</html>

@@ -1,22 +1,23 @@
 from fastapi import FastAPI, Request
-from pydantic import BaseModel
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from pmbl import PMBL
 
 app = FastAPI()
-pmbl = PMBL("./silicon-maid-7b.Q4_K_M.gguf")
+pmbl = PMBL("")
 
-class UserInput(BaseModel):
-    prompt: str
+templates = Jinja2Templates(directory="templates")
 
 @app.post("/chat")
-async def chat(user_input: UserInput):
+async def chat(request: Request):
+    user_input = (await request.json())["user_input"]
     history = pmbl.get_chat_history()
-    response = pmbl.generate_response(user_input.prompt, history)
+    response = pmbl.generate_response(user_input, history)
     return {"response": response}
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to the Persistent Memory Bot (PMB)!"}
+@app.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 if __name__ == "__main__":
     import uvicorn

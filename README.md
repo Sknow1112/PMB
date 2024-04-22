@@ -1,14 +1,14 @@
 # Persistent Memory Bot
 A chatbot that can remember all previous conversations.
 Useful for any application that requires an LM studio chatbot and functions identically to a traditional python call of a local AI Application.
-TO INSTALL:
+## TO INSTALL:
 ```
 Pip install flask install 
 Pip3 install huggingface-hub
 CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python
 
 ```
-Full docs:
+## Full docs:
 ```
 # Base ctransformers with no GPU acceleration
 pip install llama-cpp-python
@@ -26,4 +26,10 @@ CMAKE_ARGS="-DLLAMA_METAL=on" pip install llama-cpp-python
 # In windows, to set the variables CMAKE_ARGS in PowerShell, follow this format; eg for NVidia CUDA:
 $env:CMAKE_ARGS = "-DLLAMA_OPENBLAS=on"
 pip install llama-cpp-python
+
+huggingface-cli download TheBloke/Silicon-Maid-7B-GGUF silicon-maid-7b.Q4_K_M.gguf --local-dir . --local-dir-use-symlinks False
+
+huggingface-cli download lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF  Meta-Llama-3-8B-Instruct-Q8_0.gguf --local-dir . --local-dir-use-symlinks False
+
+
 ```
