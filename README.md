@@ -1,4 +1,5 @@
 # Persistent Memory Bot
+## V.1.0 Is available here. v.1.1 Is coming soon! Still in development.
 A chatbot that can remember all previous conversations.
 Useful for any application that requires an LM studio chatbot and functions identically to a traditional python call of a local AI Application.
 ## TO INSTALL:
