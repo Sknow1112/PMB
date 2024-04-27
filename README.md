@@ -1,5 +1,9 @@
 # Persistent Memory Bot
-## V.1.0 Is available here. v.1.1 Is coming soon! Still in development. Realease date May 1
+## V.1.0 Is available here. v.2.0 Is coming soon! Still in development. Realease date May 1
+planned features:
+-smart memory
+-topic creation
+-queues
 A chatbot that can remember all previous conversations.
 ### v1.0 changelog:
 Useful for any application that requires an locally running chatbot. (No LM Studio needed!) functions
