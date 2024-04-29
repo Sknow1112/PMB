@@ -8,10 +8,12 @@
    <style>
        body {
            font-family: Arial, sans-serif;
-           max-width: 800px;
-           margin: 0 auto;
+           margin: 0;
            padding: 20px;
            background: linear-gradient(to bottom right, #222222, #333333);
+           height: calc(100vh - 40px);
+           display: flex;
+           flex-direction: column;
        }
 
        h1 {
@@ -26,7 +28,7 @@
            border-radius: 5px;
            padding: 10px;
            margin-bottom: 20px;
-           height: 400px;
+           flex: 1;
            overflow-y: scroll;
            background-color: #1e1e1e;
            color: #f0f8ff;
@@ -38,6 +40,7 @@
            padding: 8px;
            border-radius: 5px;
            max-width: 80%;
+           white-space: pre-wrap;
        }
 
        .user-message {
@@ -45,6 +48,7 @@
            color: white;
            align-self: flex-end;
            margin-left: auto;
+           margin-right: 10px;
        }
 
        .bot-message {
@@ -56,6 +60,8 @@
 
        #chat-form {
            display: flex;
+           margin-top: auto;
+           margin-bottom: 20px;
        }
 
        #user-input {
@@ -84,34 +90,126 @@
        .icon {
            margin-right: 5px;
        }
+
+       #loading-message {
+           margin-top: 10px;
+           color: #00ff00;
+           font-style: italic;
+       }
+
+       .switch {
+           position: relative;
+           display: inline-block;
+           width: 60px;
+           height: 34px;
+           margin-bottom: 10px;
+       }
+
+       .switch input {
+           opacity: 0;
+           width: 0;
+           height: 0;
+       }
+
+       .slider {
+           position: absolute;
+           cursor: pointer;
+           top: 0;
+           left: 0;
+           right: 0;
+           bottom: 0;
+           background-color: #ccc;
+           transition: .4s;
+           border-radius: 34px;
+       }
+
+       .slider:before {
+           position: absolute;
+           content: "";
+           height: 26px;
+           width: 26px;
+           left: 4px;
+           bottom: 4px;
+           background-color: white;
+           transition: .4s;
+           border-radius: 50%;
+       }
+
+       input:checked + .slider {
+           background-color: #59788E;
+       }
+
+       input:checked + .slider:before {
+           transform: translateX(26px);
+       }
+
+       .mode-label {
+           margin-left: 10px;
+           color: #f0f8ff;
+       }
    </style>
    <script>
        $(document).ready(function() {
+           var memoryMode = 'full';
+
+           $('#memory-toggle').change(function() {
+               memoryMode = $(this).is(':checked') ? 'smart' : 'full';
+           });
+
            $('#chat-form').submit(function(event) {
                event.preventDefault();
                var userInput = $('#user-input').val();
+               $('#chat-container').append('<div class="message user-message"><i class="fas fa-user icon"></i>' + userInput + '</div>');
+               $('#user-input').val('');
+               $('#send-button').prop('disabled', true);
+               $('#loading-message').show();
+               var $botMessage = $('<div class="message bot-message"><i class="fas fa-robot icon"></i></div>');
+               $('#chat-container').append($botMessage);
+               var botResponse = '';
                $.ajax({
                    url: '/chat',
                    method: 'POST',
-                   data: JSON.stringify({ user_input: userInput }),
+                   data: JSON.stringify({ user_input: userInput, mode: memoryMode }),
                    contentType: 'application/json',
-                   success: function(response) {
-                       $('#chat-container').append('<div class="message user-message"><i class="fas fa-user icon"></i>' + userInput + '</div>');
-                       $('#chat-container').append('<div class="message bot-message"><i class="fas fa-robot icon"></i>' + response.response + '</div>');
-                       $('#user-input').val('');
-                       $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
+                   xhrFields: {
+                       onprogress: function(e) {
+                           var chunk = e.currentTarget.response.slice(botResponse.length);
+                           botResponse += chunk;
+                           $botMessage.html('<i class="fas fa-robot icon"></i>' + botResponse.replace(/\n/g, '<br>'));
+                           $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
+                       }
+                   },
+                   success: function() {
+                       $('#send-button').prop('disabled', false);
+                       $('#loading-message').hide();
+                   },
+                   error: function(xhr, status, error) {
+                       $('#send-button').prop('disabled', false);
+                       $('#loading-message').hide();
+                       var errorMessage = '<div class="message error-message"><i class="fas fa-exclamation-triangle icon"></i>Error: ' + error + '</div>';
+                       $('#chat-container').append(errorMessage);
                    }
                });
            });
+
+           setInterval(function() {
+               $.post('/sleep');
+           }, 120000); // 2 minutes in milliseconds
        });
    </script>
 </head>
 <body>
    <h1>Persistent Memory Bot</h1>
+   <label class="switch">
+       <input type="checkbox" id="memory-toggle">
+       <span class="slider"></span>
+   </label>
+   <label for="memory-toggle" class="mode-label">Smart Memory</label>
    <div id="chat-container"></div>
    <form id="chat-form">
        <input type="text" id="user-input" name="user_input" placeholder="Enter your message">
-       <button type="submit"><i class="fas fa-paper-plane"></i> Send</button>
+       <button type="submit" id="send-button"><i class="fas fa-paper-plane"></i> Send</button>
    </form>
+   <div id="loading-message" style="display: none;">Prompt received. Generating response...</div>
 </body>
 </html>
