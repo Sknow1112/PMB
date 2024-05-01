@@ -5,10 +5,10 @@ planned features:
 -topic creation
 -queues
 A chatbot that can remember all previous conversations.
-### v1.0 changelog:
+### v1.5 changelog:
 Useful for any application that requires an locally running chatbot. (No LM Studio needed!) functions
 with a persistent memory.
-### v.0.9
+### v.1
 Useful for any application that requires an LM studio chatbot and functions identically to a traditional python call of a local AI Application.
 ## TO INSTALL:
 ```
