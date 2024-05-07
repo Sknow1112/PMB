@@ -1,5 +1,5 @@
 # Persistent Memory Bot
-## V.1.0 Is available here. v.2.0 Is coming soon! Still in development. Release date May 1
+## V.1.0 Is available here. v.2.0 Is coming soon! Still in development. Release date Summer 2025
 planned features:
 -smart memory
 -topic creation
